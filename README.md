@@ -48,3 +48,10 @@ You can define multiple rules too. So lets say you wanted to grab some tweets ab
         Rule(track=["salami"], on_status=[print_message]),
     ]
     listener.listen(rules=rules, **AUTH)
+
+## Ideas for extensions
+
+- on_status: should take URLs too, and HTTP POST to those (requests async)
+- Add a capture_historial kwarg to Rule(), should transparently capture all historical tweets too
+- Add a Redis storage backend, and pass into .listen()
+- Add example spinup scripts for Foreman and Supervisord
