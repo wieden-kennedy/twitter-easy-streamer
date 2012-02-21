@@ -10,6 +10,7 @@ setup(
         url='https://github.com/wieden-kennedy/twitter-easy-streamer/',
         packages=find_packages(),
         include_package_data=True,
+        install_requires=['requests', 'tweepy'],
         classifiers=[
             'Development Status :: 4 - Beta',
             'Environment :: Web Environment',
