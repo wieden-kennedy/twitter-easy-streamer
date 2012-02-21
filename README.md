@@ -37,3 +37,14 @@ Put this in stream.py
 ### Step 3: Run
 
     python stream.py
+
+## More examples
+
+You can define multiple rules too. So lets say you wanted to grab some tweets about sandwiches:
+
+    rules = [
+        Rule(track=["turkey club"], on_status=[print_message]),
+        Rule(track=["panini"], on_status=[print_message]),
+        Rule(track=["salami"], on_status=[print_message]),
+    ]
+    listener.listen(rules=rules, **AUTH)
