@@ -4,3 +4,4 @@ build
 lib
 twitter_easy_streamer.egg-info
 include
+dist
