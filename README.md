@@ -6,11 +6,11 @@ This is a rule-based listener that Grant and I knocked together for a quick Nike
 
 It lives here now, as it's own library - with some additions to make it even easier to use.
 
-### Installation
+### Step 1: Install
 
     pip install -e "git+git@github.com:wieden-kennedy/twitter-easy-streamer.git#egg=twitter_easy_streamer"
 
-### Example usage
+### Step 2: Start with this example
 
 Put this in stream.py
 
@@ -34,6 +34,6 @@ Put this in stream.py
 
     start()
 
-Now:
+### Step 3: Run
 
     python stream.py
