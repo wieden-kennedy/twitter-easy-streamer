@@ -123,22 +123,3 @@ class Rule:
         -callback_url: the url to post to when a matching tweet is found
         """
         return Rule(**dict)
-        
-        
-def main(consumerkey, consumersecret, accesstoken, accesstokensecret):
-    listener = RuleListener()
-    listener.listen(consumerkey, consumersecret, accesstoken, accesstokensecret, [Rule(follow=["realgrantthomas",], track=["salami",])])
-    
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('consumerkey', action="store")
-    parser.add_argument('consumersecret', action="store")
-    parser.add_argument('accesstoken', action="store")
-    parser.add_argument('accesstokensecret', action="store")
-    values = parser.parse_args()
-
-    try:
-        main(values.consumerkey, values.consumersecret, values.accesstoken, values.accesstokensecret)
-    except KeyboardInterrupt:
-        print "\nAll Done!"
