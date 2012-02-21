@@ -1,7 +1,7 @@
 from twitter_easy_streamer.streamer import Rule, RuleListener
 
-def print_message(tweet):
-    print tweet.text
+def print_message(tweets):
+    print tweets[0].text
 
 def start():
     listener = RuleListener()
@@ -13,7 +13,7 @@ def start():
         'access_token_secret': 'ZMtTEXGZ5aNnGrMF03l0lSkqCaouo0CjJbEiN41QlO4'
     }
 
-    rules = [Rule(track=["football"], on_status=[print_message])]
+    rules = [Rule(track=["californication"], historical=True, on_status=[print_message])]
     listener.listen(rules=rules, **AUTH)
 
 start()

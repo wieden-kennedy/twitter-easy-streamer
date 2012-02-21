@@ -11,6 +11,7 @@ import json
 import requests
 from operator import attrgetter
 from tweepy import Stream, API, BasicAuthHandler, StreamListener, OAuthHandler
+from tweepy.error import TweepError
 
 DEFAULT_CALLBACK_URL = "http://www.google.com"
 
@@ -30,14 +31,25 @@ class RuleListener(StreamListener):
         track_list = []
         location_list = []
         
+        self.api = API(auth_handler)
+
         for rule in self.ruleset:
             if rule.follow:
                 for user in rule.follow:                                       
-                    follow_list.append(API(auth_handler).get_user(user).id)
+                    follow_list.append(self.api.get_user(user).id)
             if rule.track:
                 track_list += rule.track
             if rule.location:
                 location_list += rule.location
+            if rule.historical:
+                for phrase in track_list:
+                    for i in range(1, 100):
+                        try:
+                            results = self.api.search(phrase, rpp=100, page=i)
+                            rule.send_tweets_to_callback(results)
+                        except TweepError:
+                            break
+
         self.stream.filter(follow=follow_list, track=track_list, locations=location_list)
             
     @property
@@ -55,10 +67,10 @@ class RuleListener(StreamListener):
         for rule in self.ruleset:
             if rule.match(status):               
                 requests.post(rule.callback_url, data={"tweet_id": status.id})                
-                for callback in rule.on_status_callbacks:
-                    callback(status)
+                rule.send_tweets_to_callback([status])
 
         return
+
     def on_error(self, status_code):
         """
         Error callback. Returns True so the stream doesn't get closed.
@@ -69,7 +81,7 @@ class Rule:
     """
     A simple class defining a rule for filtering twitter's streaming API
     """
-    def __init__(self, priority=0, follow=None, track=None, location=None, callback_url=None, operator=None, on_status=[]):
+    def __init__(self, priority=0, follow=None, track=None, location=None, callback_url=None, operator=None, on_status=[], historical=False):
         self.priority = priority
         self.follow = follow
         self.track = track
@@ -77,6 +89,10 @@ class Rule:
         self.callback_url = callback_url or DEFAULT_CALLBACK_URL
         self.on_status_callbacks = on_status
         self.operator = operator or "AND"
+        self.historical = historical
+
+    def search(self):
+        pass
 
     def match(self, status):
         """
@@ -103,6 +119,10 @@ class Rule:
         in our filter.
         """
         return all([phrase in status.text for phrase in self.track])
+
+    def send_tweets_to_callback(self, tweets):
+        for callback in self.on_status_callbacks:
+            callback(tweets)
 
     @classmethod
     def from_json(cls, json):
