@@ -7,6 +7,7 @@ CONSUMERSECRET = "2hsTMOBuO0eL6arelLeztLYp2buNzJ75Hq33bYyxuYY"
 ACCESSTOKEN = "463307634-CXSnhOVJfn4ZG3Mufuk4fsDe9Pl02CFOOtkwCYtM"
 ACCESSTOKENSECRET = "FHbIAU0yHg2MJGjonnH2CaXF1McKfZAWpw02QSo2Q"
 """
+import signal
 import json
 import requests
 from operator import attrgetter
@@ -35,7 +36,7 @@ class RuleListener(StreamListener):
 
         for rule in self.ruleset:
             if rule.follow:
-                for user in rule.follow:                                       
+                for user in rule.follow:                                 
                     follow_list.append(self.api.get_user(user).id)
             if rule.track:
                 track_list += rule.track
@@ -49,8 +50,14 @@ class RuleListener(StreamListener):
                             rule.send_tweets_to_callback(results)
                         except TweepError:
                             break
+        try:
+            signal.signal(signal.SIGTERM, self.disconnect)
+            self.stream.filter(follow=follow_list, track=track_list, locations=location_list)
+        except KeyboardInterrupt:
+            self.stream.disconnect()
 
-        self.stream.filter(follow=follow_list, track=track_list, locations=location_list)
+    def disconnect(self):
+        self.stream.disconnect()
             
     @property
     def ruleset(self):
@@ -111,14 +118,15 @@ class Rule:
         in our filter.
         """
         if self.follow is not None:
-            return all(["@"+username in status.text for username in self.follow])
+            return all([username in status.user.screen_name for username in self.follow if username])
 
     def track_match(self, status):
         """
         Return True if the given status contains all of the tracked phrases
         in our filter.
         """
-        return all([phrase in status.text for phrase in self.track])
+        if self.track is not None:
+            return all([phrase in status.text for phrase in self.track if phrase])
 
     def send_tweets_to_callback(self, tweets):
         for callback in self.on_status_callbacks:
