@@ -25,18 +25,18 @@ class RuleListener(StreamListener):
         self._ruleset = rules
 
         auth_handler = OAuthHandler(consumer_key, consumer_secret)
-        auth_handler.set_access_token(access_token, access_token_secret) 
+        auth_handler.set_access_token(access_token, access_token_secret)
         self.stream = Stream(auth_handler, self, timeout=None)
 
         follow_list = []
         track_list = []
         location_list = []
-        
+
         self.api = API(auth_handler)
 
         for rule in self.ruleset:
             if rule.follow:
-                for user in rule.follow:                                 
+                for user in rule.follow:
                     follow_list.append(self.api.get_user(user).id)
             if rule.track:
                 track_list += rule.track
@@ -58,22 +58,22 @@ class RuleListener(StreamListener):
 
     def disconnect(self):
         self.stream.disconnect()
-            
+
     @property
     def ruleset(self):
         """
         Return the set of rules for this listener, sorted by priority
         """
         return sorted(self._ruleset, key=attrgetter('priority'))
-    
+
     def on_status(self, status):
         """
         Callback triggered when we receive a matching tweet.
-        Print the text and post the tweet's id to the endpoint specified by the given rule.y    
+        Print the text and post the tweet's id to the endpoint specified by the given rule.y
         """
         for rule in self.ruleset:
-            if rule.match(status):               
-                requests.post(rule.callback_url, data={"tweet_id": status.id})                
+            if rule.match(status):
+                requests.post(rule.callback_url, data={"tweet_id": status.id})
                 rule.send_tweets_to_callback([status])
 
         return
@@ -83,7 +83,7 @@ class RuleListener(StreamListener):
         Error callback. Returns True so the stream doesn't get closed.
         """
         return True;
-    
+
 class Rule:
     """
     A simple class defining a rule for filtering twitter's streaming API
@@ -92,7 +92,7 @@ class Rule:
         self.priority = priority
         self.follow = follow
         self.track = track
-        self.location = location       
+        self.location = location
         self.callback_url = callback_url or DEFAULT_CALLBACK_URL
         self.on_status_callbacks = on_status
         self.operator = operator or "AND"
@@ -138,7 +138,7 @@ class Rule:
         Build a Rule from the given JSON string
         """
         return from_dict(json.loads(json))
-    
+
     @classmethod
     def from_dict(cls, dict):
         """
