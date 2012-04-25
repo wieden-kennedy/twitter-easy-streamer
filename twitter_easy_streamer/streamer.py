@@ -118,7 +118,10 @@ class Rule:
         in our filter.
         """
         if self.follow is not None:
-            return all([username in status.user.screen_name for username in self.follow if username])
+            if self.operator == "AND":
+                return all([username in status.user.screen_name for username in self.follow if username])
+            else:
+                return any([username in status.user.screen_name for username in self.follow if username])
 
     def track_match(self, status):
         """
