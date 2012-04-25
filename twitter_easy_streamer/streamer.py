@@ -118,7 +118,10 @@ class Rule:
         in our filter.
         """
         if self.follow is not None:
-            return all([username in status.user.screen_name for username in self.follow if username])
+            if self.operator == "AND":
+                return all([username in status.user.screen_name for username in self.follow if username])
+            else:
+                return any([username in status.user.screen_name for username in self.follow if username])
 
     def track_match(self, status):
         """
@@ -126,7 +129,11 @@ class Rule:
         in our filter.
         """
         if self.track is not None:
-            return all([phrase in status.text for phrase in self.track if phrase])
+            if self.operator == "AND":
+                return all([phrase in status.text for phrase in self.track if phrase])
+            else:
+                return any([phrase in status.text for phrase in self.track if phrase])
+        
 
     def send_tweets_to_callback(self, tweets):
         for callback in self.on_status_callbacks:
