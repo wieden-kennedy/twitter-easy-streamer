@@ -130,7 +130,7 @@ class Rule:
         """
         if self.track is not None:
             print status
-            return all([phrase in status.text for phrase in self.track if phrase]) or all([phrase in status.entities.urls.expanded_url for phrase in self.track if phrase])
+            return all([phrase in status.text for phrase in self.track if phrase])
 
     def send_tweets_to_callback(self, tweets):
         for callback in self.on_status_callbacks:
