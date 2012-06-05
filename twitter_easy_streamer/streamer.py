@@ -133,7 +133,6 @@ class Rule:
                 return all([phrase.lower() in status.text.lower() for phrase in self.track if phrase])
             else:
                 return any([phrase.lower() in status.text.lower() for phrase in self.track if phrase])
-        
 
     def send_tweets_to_callback(self, tweets):
         for callback in self.on_status_callbacks:
