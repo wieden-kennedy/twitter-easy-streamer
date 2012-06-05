@@ -130,9 +130,9 @@ class Rule:
         """
         if self.track is not None:
             if self.operator == "AND":
-                return all([phrase in status.text for phrase in self.track if phrase])
+                return all([phrase.lower() in status.text.lower() for phrase in self.track if phrase])
             else:
-                return any([phrase in status.text for phrase in self.track if phrase])
+                return any([phrase.lower() in status.text.lower() for phrase in self.track if phrase])
         
 
     def send_tweets_to_callback(self, tweets):
