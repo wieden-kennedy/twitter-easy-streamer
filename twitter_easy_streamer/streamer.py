@@ -35,6 +35,7 @@ class RuleListener(StreamListener):
         self.api = API(auth_handler)
 
         for rule in self.ruleset:
+            rule.set_api(self.get_api())
             if rule.follow:
                 for user in rule.follow:
                     follow_list.append(self.api.get_user(user).id)
@@ -47,7 +48,7 @@ class RuleListener(StreamListener):
                     for i in range(1, 100):
                         try:
                             results = self.api.search(phrase, rpp=100, page=i)
-                            rule.send_tweets_to_callback(results)
+                            rule.send_tweets_to_callback(results, self.api)
                         except TweepError:
                             break
         try:
@@ -82,7 +83,10 @@ class RuleListener(StreamListener):
         """
         Error callback. Returns True so the stream doesn't get closed.
         """
-        return True;
+        return True
+
+    def get_api(self):
+        return self.api
 
 class Rule:
     """
@@ -134,9 +138,12 @@ class Rule:
             else:
                 return any([phrase.lower() in status.text.lower() for phrase in self.track if phrase])
 
-    def send_tweets_to_callback(self, tweets):
+    def send_tweets_to_callback(self, tweets, api):
         for callback in self.on_status_callbacks:
-            callback(tweets)
+            callback(tweets, api)
+
+    def set_api(self, api):
+        self.api = api
 
     @classmethod
     def from_json(cls, json):

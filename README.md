@@ -16,7 +16,9 @@ Put this in stream.py
 
     from twitter_easy_streamer.streamer import Rule, RuleListener
 
-    def print_message(tweets):
+    def print_message(tweets, api):
+        # `api` is the instance of tweepy.API that RuleListener used,
+        # which might be useful if you want to post a tweet from this callback.
         print tweets[0].text
 
     def start():
