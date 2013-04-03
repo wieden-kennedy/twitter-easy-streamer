@@ -75,7 +75,7 @@ class RuleListener(StreamListener):
         for rule in self.ruleset:
             if rule.match(status):
                 requests.post(rule.callback_url, data={"tweet_id": status.id})
-                rule.send_tweets_to_callback([status])
+                rule.send_tweets_to_callback([status], self.get_api())
 
         return
 
